@@ -10,6 +10,7 @@ namespace GestKaixa
 
         static void Main(string[] args)
         {
+            Console.Clear();
             FuncioPrincipal();
         }
 
@@ -146,7 +147,7 @@ namespace GestKaixa
 
         static void VeureComptes()
         {
-            Console.WriteLine(" COMPTES ASSOCIATS ");
+            Console.WriteLine(" ===COMPTES ASSOCIATS=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -175,7 +176,7 @@ namespace GestKaixa
         static void ConsultarSaldo()
         {
 
-            Console.WriteLine("CONSULTA DE SALDO: ");
+            Console.WriteLine(" ===CONSULTA DE SALDO=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -205,7 +206,7 @@ namespace GestKaixa
         static void VeureMoviments()
         {
 
-            Console.WriteLine(" MOVIMENTS: ");
+            Console.WriteLine(" ===MOVIMENTS=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -235,7 +236,7 @@ namespace GestKaixa
 
         static void FerIngres()
         {
-            Console.WriteLine(" FER UN INGRÉS: ");
+            Console.WriteLine(" ===FER UN INGRÉS=== ");
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
             Console.Write("Import: "); decimal import = Convert.ToDecimal(Console.ReadLine());
             Console.Write("Concepte: "); string concepte = Console.ReadLine();
@@ -257,7 +258,7 @@ namespace GestKaixa
 
         static void FerRetirada()
         {
-            Console.WriteLine("FER UNA RETIRADA: ");
+            Console.WriteLine(" ===FER UNA RETIRADA=== ");
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
             Console.Write("Import: "); decimal import = Convert.ToDecimal(Console.ReadLine());
             Console.Write("Concepte: "); string concepte = Console.ReadLine();
@@ -281,7 +282,7 @@ namespace GestKaixa
 
         static void VeureAlertes()
         {
-            Console.WriteLine(" ALERTES: ");
+            Console.WriteLine(" ===ALERTES=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -345,9 +346,139 @@ namespace GestKaixa
             }
         }
 
-        static void RegistrarNouUsuari() { }
-        static void ObrirNouCompte() { }
-        static void AssignarUsuariACompte() { }
-        static void LlistarUsuarisIComptes() { }
+        static void RegistrarNouUsuari()
+        {
+            Console.WriteLine(" ===REGISTRAR NOU USUARI=== ");
+            Console.Write("DNI: "); string dni = Console.ReadLine();
+            Console.Write("Nom: "); string nom = Console.ReadLine();
+            Console.Write("Cognom: "); string cognom = Console.ReadLine();
+            Console.Write("Adreça: "); string adreca = Console.ReadLine();
+            Console.Write("Telèfon: "); string telefon = Console.ReadLine();
+            Console.Write("Username: "); string username = Console.ReadLine();
+            Console.Write("Password: "); string password = Console.ReadLine();
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "INSERT INTO Usuaris (dni, nom, cognom, adreca, telefon, username, password) VALUES (@dni, @nom, @cog, @adr, @tel, @usr, @pass)";
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@dni", dni);
+                        cmd.Parameters.AddWithValue("@nom", nom);
+                        cmd.Parameters.AddWithValue("@cog", cognom);
+                        cmd.Parameters.AddWithValue("@adr", adreca);
+                        cmd.Parameters.AddWithValue("@tel", telefon);
+                        cmd.Parameters.AddWithValue("@usr", username);
+                        cmd.Parameters.AddWithValue("@pass", password);
+                        cmd.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Usuari registrat correctament.");
+                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
+            }
+            Console.WriteLine("\nPrem Enter per continuar...");
+            Console.ReadLine();
+        }
+
+        static void ObrirNouCompte()
+        {
+            Console.WriteLine(" ===OBRIR NOU COMPTE=== ");
+            Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "INSERT INTO Comptes (numero_compte) VALUES (@num)";
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@num", numeroCompte);
+                        cmd.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Compte obert correctament.");
+                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
+            }
+            Console.WriteLine("\nPrem Enter per continuar...");
+            Console.ReadLine();
+        }
+
+        static void AssignarUsuariACompte()
+        {
+            Console.WriteLine(" ===ASSIGNAR USUARI A COMPTE=== ");
+            Console.Write("Username de l'usuari: "); string username = Console.ReadLine();
+            Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
+            Console.Write("Rol (TITULAR/AUTORITZAT): "); string rol = Console.ReadLine();
+
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+
+                    string sqlUsuari = "SELECT id FROM Usuaris WHERE username = @usr";
+                    int uid = 0;
+                    using (MySqlCommand cmd = new MySqlCommand(sqlUsuari, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@usr", username);
+                        object res = cmd.ExecuteScalar();
+                        if (res != null) uid = Convert.ToInt32(res);
+                    }
+
+                    if (uid == 0) { Console.WriteLine("Usuari no trobat."); Console.ReadLine(); return; }
+
+                    string sqlCompte = "SELECT id FROM Comptes WHERE numero_compte = @num";
+                    int cid = 0;
+                    using (MySqlCommand cmd = new MySqlCommand(sqlCompte, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@num", numeroCompte);
+                        object res = cmd.ExecuteScalar();
+                        if (res != null) cid = Convert.ToInt32(res);
+                    }
+
+                    if (cid == 0) { Console.WriteLine("Compte no trobat."); Console.ReadLine(); return; }
+
+                    string sqlAssignar = "INSERT INTO UsuarisComptes (usuari_id, compte_id, rol) VALUES (@uid, @cid, @rol)";
+                    using (MySqlCommand cmd = new MySqlCommand(sqlAssignar, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@uid", uid);
+                        cmd.Parameters.AddWithValue("@cid", cid);
+                        cmd.Parameters.AddWithValue("@rol", rol);
+                        cmd.ExecuteNonQuery();
+                    }
+                    Console.WriteLine("Usuari assignat al compte correctament.");
+                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
+            }
+            Console.WriteLine("\nPrem Enter per continuar...");
+            Console.ReadLine();
+        }
+
+        static void LlistarUsuarisIComptes()
+        {
+            Console.WriteLine(" ===USUARIS I COMPTES=== ");
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = @"SELECT u.username, u.nom, u.cognom, c.numero_compte, uc.rol
+                           FROM Usuaris u
+                           INNER JOIN UsuarisComptes uc ON u.id = uc.usuari_id
+                           INNER JOIN Comptes c ON uc.compte_id = c.id
+                           ORDER BY u.username";
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
+                            Console.WriteLine($"{reader["username"]} | {reader["nom"]} {reader["cognom"]} | Compte: {reader["numero_compte"]} | Rol: {reader["rol"]}");
+                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
+            }
+            Console.WriteLine("\nPrem Enter per continuar...");
+            Console.ReadLine();
+        }
     }
 }

@@ -602,11 +602,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\clash\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
+      "projectUniqueName": "C:\\Users\\clash\\Documents\\GitHub\\GestKaixa\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
       "projectName": "GestKaixa",
-      "projectPath": "C:\\Users\\clash\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
+      "projectPath": "C:\\Users\\clash\\Documents\\GitHub\\GestKaixa\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
       "packagesPath": "C:\\Users\\clash\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\clash\\Projecte_Entorns\\GestKaixa\\obj\\",
+      "outputPath": "C:\\Users\\clash\\Documents\\GitHub\\GestKaixa\\Projecte_Entorns\\GestKaixa\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

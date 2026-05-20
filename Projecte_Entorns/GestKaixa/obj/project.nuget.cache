@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pQxHPw0f584=",
+  "dgSpecHash": "I8On5u5zT5s=",
   "success": true,
-  "projectFilePath": "C:\\Users\\clash\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
+  "projectFilePath": "C:\\Users\\clash\\Documents\\GitHub\\GestKaixa\\Projecte_Entorns\\GestKaixa\\GestKaixa.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\clash\\.nuget\\packages\\bouncycastle.cryptography\\2.6.2\\bouncycastle.cryptography.2.6.2.nupkg.sha512",
     "C:\\Users\\clash\\.nuget\\packages\\google.protobuf\\3.32.0\\google.protobuf.3.32.0.nupkg.sha512",
