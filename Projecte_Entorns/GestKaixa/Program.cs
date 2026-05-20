@@ -19,13 +19,9 @@ namespace GestKaixa
             bool esAdmin;
             UsuariIValidar(out esAdmin);
             if (esAdmin)
-            {
                 GestionarMenuAdmin();
-            }
             else if (usuariId != 0)
-            {
                 GestionarMenuClient();
-            }
         }
 
         static void UsuariIValidar(out bool esAdmin)
@@ -34,21 +30,39 @@ namespace GestKaixa
             Console.Write("Usuari: ");
             string usuari = Console.ReadLine();
             Console.Write("Contrasenya: ");
-            string password = Console.ReadLine();
+            string password = LlegirPasswordOcult();
 
             if (usuari == "cashbox_app" && password == "app123")
-            {
                 esAdmin = true;
-            }
             else if (ValidarClientABaseDeDades(usuari, password))
-            {
                 esAdmin = false;
-            }
             else
             {
                 Console.WriteLine("Accés denegat. Credencials incorrectes.");
                 esAdmin = false;
             }
+        }
+
+        static string LlegirPasswordOcult()
+        {
+            string password = "";
+            ConsoleKeyInfo tecla;
+            do
+            {
+                tecla = Console.ReadKey(true);
+                if (tecla.Key != ConsoleKey.Enter && tecla.Key != ConsoleKey.Backspace)
+                {
+                    password += tecla.KeyChar;
+                    Console.Write("*");
+                }
+                else if (tecla.Key == ConsoleKey.Backspace && password.Length > 0)
+                {
+                    password = password.Substring(0, password.Length - 1);
+                    Console.Write("\b \b");
+                }
+            } while (tecla.Key != ConsoleKey.Enter);
+            Console.WriteLine();
+            return password;
         }
 
         static bool ValidarClientABaseDeDades(string usuari, string password)
@@ -72,10 +86,7 @@ namespace GestKaixa
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error de BD: " + ex.Message);
-                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
             return loginCorrecte;
         }
@@ -83,12 +94,15 @@ namespace GestKaixa
         static int MostrarMenuAdmin()
         {
             int opcio;
+            Console.Clear();
             Console.WriteLine("SISTEMA GESTKAIXA - MÒDUL ADMINISTRADOR");
             Console.WriteLine("1. Registrar nous usuaris");
             Console.WriteLine("2. Obrir nous comptes.");
             Console.WriteLine("3. Assignar usuaris a comptes.");
             Console.WriteLine("4. Llistar tots els usuaris i els comptes associats.");
-            Console.WriteLine("5. Sortir");
+            Console.WriteLine("5. Llistar tots els usuaris.");
+            Console.WriteLine("6. Sortir");
+            Console.Write("Opció: ");
             opcio = Convert.ToInt32(Console.ReadLine());
             return opcio;
         }
@@ -96,6 +110,8 @@ namespace GestKaixa
         static int MostrarMenuClient()
         {
             int opcio;
+            Console.Clear();
+            Console.WriteLine("SISTEMA GESTKAIXA - MÒDUL CLIENT");
             Console.WriteLine("1. Veure els seus comptes.");
             Console.WriteLine("2. Consultar el saldo.");
             Console.WriteLine("3. Veure moviments.");
@@ -103,6 +119,7 @@ namespace GestKaixa
             Console.WriteLine("5. Fer una retirada.");
             Console.WriteLine("6. Veure alertes");
             Console.WriteLine("7. Sortir");
+            Console.Write("Opció: ");
             opcio = Convert.ToInt32(Console.ReadLine());
             return opcio;
         }
@@ -119,10 +136,11 @@ namespace GestKaixa
                     case 2: ObrirNouCompte(); break;
                     case 3: AssignarUsuariACompte(); break;
                     case 4: LlistarUsuarisIComptes(); break;
-                    case 5: Console.WriteLine("Sortint..."); break;
+                    case 5: LlistarTotsElsUsuaris(); break;
+                    case 6: Console.WriteLine("Sortint..."); break;
                     default: Console.WriteLine("Opció no vàlida."); break;
                 }
-            } while (opcio != 5);
+            } while (opcio != 6);
         }
 
         static void GestionarMenuClient()
@@ -147,6 +165,7 @@ namespace GestKaixa
 
         static void VeureComptes()
         {
+            Console.Clear();
             Console.WriteLine(" ===COMPTES ASSOCIATS=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -161,10 +180,8 @@ namespace GestKaixa
                     {
                         cmd.Parameters.AddWithValue("@uid", usuariId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
                             while (reader.Read())
                                 Console.WriteLine($"Número: {reader["numero_compte"]} | Estat: {reader["estat"]} | Data: {reader["data_creacio"]}");
-                        }
                     }
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
@@ -175,7 +192,7 @@ namespace GestKaixa
 
         static void ConsultarSaldo()
         {
-
+            Console.Clear();
             Console.WriteLine(" ===CONSULTA DE SALDO=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -191,10 +208,8 @@ namespace GestKaixa
                     {
                         cmd.Parameters.AddWithValue("@uid", usuariId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
                             while (reader.Read())
                                 Console.WriteLine($"Compte: {reader["numero_compte"]} | Saldo: {reader["saldo"]} €");
-                        }
                     }
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
@@ -205,7 +220,7 @@ namespace GestKaixa
 
         static void VeureMoviments()
         {
-
+            Console.Clear();
             Console.WriteLine(" ===MOVIMENTS=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -222,10 +237,8 @@ namespace GestKaixa
                     {
                         cmd.Parameters.AddWithValue("@uid", usuariId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
                             while (reader.Read())
                                 Console.WriteLine($"[{reader["data"]}] {reader["numero_compte"]} | {reader["concepte"]} | Import: {reader["import"]} € | Saldo: {reader["saldo"]} €");
-                        }
                     }
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
@@ -236,6 +249,7 @@ namespace GestKaixa
 
         static void FerIngres()
         {
+            Console.Clear();
             Console.WriteLine(" ===FER UN INGRÉS=== ");
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
             Console.Write("Import: "); decimal import = Convert.ToDecimal(Console.ReadLine());
@@ -253,11 +267,13 @@ namespace GestKaixa
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
+            Console.WriteLine("\nPrem Enter per continuar...");
             Console.ReadLine();
         }
 
         static void FerRetirada()
         {
+            Console.Clear();
             Console.WriteLine(" ===FER UNA RETIRADA=== ");
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
             Console.Write("Import: "); decimal import = Convert.ToDecimal(Console.ReadLine());
@@ -277,11 +293,13 @@ namespace GestKaixa
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
+            Console.WriteLine("\nPrem Enter per continuar...");
             Console.ReadLine();
         }
 
         static void VeureAlertes()
         {
+            Console.Clear();
             Console.WriteLine(" ===ALERTES=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -297,14 +315,13 @@ namespace GestKaixa
                     {
                         cmd.Parameters.AddWithValue("@uid", usuariId);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
-                        {
                             while (reader.Read())
                                 Console.WriteLine($"[{reader["data"]}] {reader["numero_compte"]}: {reader["missatge"]}");
-                        }
                     }
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
+            Console.WriteLine("\nPrem Enter per continuar...");
             Console.ReadLine();
         }
 
@@ -348,6 +365,7 @@ namespace GestKaixa
 
         static void RegistrarNouUsuari()
         {
+            Console.Clear();
             Console.WriteLine(" ===REGISTRAR NOU USUARI=== ");
             Console.Write("DNI: "); string dni = Console.ReadLine();
             Console.Write("Nom: "); string nom = Console.ReadLine();
@@ -355,8 +373,7 @@ namespace GestKaixa
             Console.Write("Adreça: "); string adreca = Console.ReadLine();
             Console.Write("Telèfon: "); string telefon = Console.ReadLine();
             Console.Write("Username: "); string username = Console.ReadLine();
-            Console.Write("Password: "); string password = Console.ReadLine();
-
+            Console.Write("Password: "); string password = LlegirPasswordOcult();
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -384,9 +401,9 @@ namespace GestKaixa
 
         static void ObrirNouCompte()
         {
+            Console.Clear();
             Console.WriteLine(" ===OBRIR NOU COMPTE=== ");
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
-
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
@@ -408,17 +425,16 @@ namespace GestKaixa
 
         static void AssignarUsuariACompte()
         {
+            Console.Clear();
             Console.WriteLine(" ===ASSIGNAR USUARI A COMPTE=== ");
             Console.Write("Username de l'usuari: "); string username = Console.ReadLine();
             Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
             Console.Write("Rol (TITULAR/AUTORITZAT): "); string rol = Console.ReadLine();
-
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-
                     string sqlUsuari = "SELECT id FROM Usuaris WHERE username = @usr";
                     int uid = 0;
                     using (MySqlCommand cmd = new MySqlCommand(sqlUsuari, conn))
@@ -427,7 +443,6 @@ namespace GestKaixa
                         object res = cmd.ExecuteScalar();
                         if (res != null) uid = Convert.ToInt32(res);
                     }
-
                     if (uid == 0) { Console.WriteLine("Usuari no trobat."); Console.ReadLine(); return; }
 
                     string sqlCompte = "SELECT id FROM Comptes WHERE numero_compte = @num";
@@ -438,7 +453,6 @@ namespace GestKaixa
                         object res = cmd.ExecuteScalar();
                         if (res != null) cid = Convert.ToInt32(res);
                     }
-
                     if (cid == 0) { Console.WriteLine("Compte no trobat."); Console.ReadLine(); return; }
 
                     string sqlAssignar = "INSERT INTO UsuarisComptes (usuari_id, compte_id, rol) VALUES (@uid, @cid, @rol)";
@@ -459,6 +473,7 @@ namespace GestKaixa
 
         static void LlistarUsuarisIComptes()
         {
+            Console.Clear();
             Console.WriteLine(" ===USUARIS I COMPTES=== ");
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
@@ -466,14 +481,35 @@ namespace GestKaixa
                 {
                     conn.Open();
                     string sql = @"SELECT u.username, u.nom, u.cognom, c.numero_compte, uc.rol
-                           FROM Usuaris u
-                           INNER JOIN UsuarisComptes uc ON u.id = uc.usuari_id
-                           INNER JOIN Comptes c ON uc.compte_id = c.id
-                           ORDER BY u.username";
+                                   FROM Usuaris u
+                                   INNER JOIN UsuarisComptes uc ON u.id = uc.usuari_id
+                                   INNER JOIN Comptes c ON uc.compte_id = c.id
+                                   ORDER BY u.username";
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                         while (reader.Read())
                             Console.WriteLine($"{reader["username"]} | {reader["nom"]} {reader["cognom"]} | Compte: {reader["numero_compte"]} | Rol: {reader["rol"]}");
+                }
+                catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
+            }
+            Console.WriteLine("\nPrem Enter per continuar...");
+            Console.ReadLine();
+        }
+
+        static void LlistarTotsElsUsuaris()
+        {
+            Console.Clear();
+            Console.WriteLine(" ===LLISTAT DE TOTS ELS USUARIS=== ");
+            using (MySqlConnection conn = new MySqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string sql = "SELECT id, dni, nom, cognom, username, telefon FROM Usuaris ORDER BY cognom";
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                        while (reader.Read())
+                            Console.WriteLine($"[{reader["id"]}] {reader["nom"]} {reader["cognom"]} | DNI: {reader["dni"]} | Username: {reader["username"]} | Tel: {reader["telefon"]}");
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
