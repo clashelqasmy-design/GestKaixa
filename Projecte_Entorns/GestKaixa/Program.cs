@@ -413,10 +413,9 @@ namespace GestKaixa
                 try
                 {
                     conn.Open();
-
                     do
                     {
-                        numeroCompte = "";
+                        numeroCompte = "ES";
                         for (int i = 0; i < 10; i++)
                         {
                             numeroCompte += random.Next(0, 10).ToString();
@@ -429,7 +428,6 @@ namespace GestKaixa
                             int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
                             if (count == 0) existeix = false;
                         }
-
                     } while (existeix);
 
                     string sqlInsert = "INSERT INTO Comptes (numero_compte) VALUES (@num)";
