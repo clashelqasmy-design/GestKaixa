@@ -403,19 +403,42 @@ namespace GestKaixa
         {
             Console.Clear();
             Console.WriteLine(" ===OBRIR NOU COMPTE=== ");
-            Console.Write("Número de compte: "); string numeroCompte = Console.ReadLine();
+
+            Random random = new Random();
+            string numeroCompte;
+            bool existeix = true;
+
             using (MySqlConnection conn = new MySqlConnection(connectionString))
             {
                 try
                 {
                     conn.Open();
-                    string sql = "INSERT INTO Comptes (numero_compte) VALUES (@num)";
-                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+
+                    do
                     {
-                        cmd.Parameters.AddWithValue("@num", numeroCompte);
-                        cmd.ExecuteNonQuery();
+                        numeroCompte = "";
+                        for (int i = 0; i < 10; i++)
+                        {
+                            numeroCompte += random.Next(0, 10).ToString();
+                        }
+
+                        string sqlCheck = "SELECT COUNT(*) FROM Comptes WHERE numero_compte = @num";
+                        using (MySqlCommand cmdCheck = new MySqlCommand(sqlCheck, conn))
+                        {
+                            cmdCheck.Parameters.AddWithValue("@num", numeroCompte);
+                            int count = Convert.ToInt32(cmdCheck.ExecuteScalar());
+                            if (count == 0) existeix = false;
+                        }
+
+                    } while (existeix);
+
+                    string sqlInsert = "INSERT INTO Comptes (numero_compte) VALUES (@num)";
+                    using (MySqlCommand cmdInsert = new MySqlCommand(sqlInsert, conn))
+                    {
+                        cmdInsert.Parameters.AddWithValue("@num", numeroCompte);
+                        cmdInsert.ExecuteNonQuery();
                     }
-                    Console.WriteLine("Compte obert correctament.");
+                    Console.WriteLine($"Compte obert correctament. Número generat: {numeroCompte}");
                 }
                 catch (Exception ex) { Console.WriteLine("Error de BD: " + ex.Message); }
             }
